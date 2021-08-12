@@ -1,0 +1,2 @@
+# Management System
+このプロジェクトはReactの勉強のために作られたアプリです。
