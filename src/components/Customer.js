@@ -1,4 +1,8 @@
 import React from 'react';
+// UI 요소 
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell'
+
 
 class Customer extends React.Component {
     constructor(props) {
@@ -10,32 +14,16 @@ class Customer extends React.Component {
 
     render () {
         return (
-            <div>
-                <CustomerProfile id={this.props.id} name={this.props.name} image={this.props.image}/>
-                <CustomerInfo job= {this.props.job} gender={this.props.gender}/>
-            </div>
+            <TableRow>
+                <TableCell>{this.props.id}</TableCell>
+                <TableCell><img src={this.props.image} alt='profile'/></TableCell>
+                <TableCell>{this.props.name}</TableCell>
+                <TableCell>{this.props.birthday}</TableCell>
+                <TableCell>{this.props.gender}</TableCell>
+                <TableCell>{this.props.job}</TableCell>
+            </TableRow>
         );
     }
-}
-
-function CustomerProfile(props) {
-    return (
-        <div>
-            <img src={props.image} alt="profile"/>
-            <h2>{props.name}({props.id})</h2>
-        </div>
-    );
-}
-
-function CustomerInfo(props) {
-    return(
-        <div>
-            <p>{props.birthday}</p>
-            <p>{props.gender}</p>
-            <p>{props.job}</p>
-        </div>
-
-    );
 }
 
 
