@@ -13,7 +13,7 @@ import { TableCell } from '@material-ui/core';
 // 컴포넌트의 외부를 감싸기 위해서 사용하는 컴포넌트
 import { Paper } from '@material-ui/core';
 // CSS 스타일 결정을 위해 사용
-import {withStyles} from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 //클래스명 복수개 적용
 import classNames from 'classnames';
@@ -22,54 +22,36 @@ const styles = theme => ({
   root: {
     width: "100%",
     overflowX: "auto",
-    marginTop: theme.spacing(3) 
+    marginTop: theme.spacing(3)
   },
   table: {
     minWidth: 1080
   }
 });
 
-// const styles = {
-//   root: {
-//     width: "75%",
-//     overflowX: "auto"
-//   },
-//   talbe: {
-//     minWidth: 1080
-//   }
-// };
-
-// 서버에서 받았다고 가정하는 부분
-const customers = [
-  {
-    id: 1,
-    image: 'https://placeimg.com/64/64/1',
-    name: '이한결',
-    birthday: '1992-10-24',
-    gender: 'Male',
-    job: '무직백수',
-  },
-  {
-    id: 2,
-    image: 'https://placeimg.com/64/64/2',
-    name: '홍길동',
-    birthday: '1600-01-01',
-    gender: 'Male',
-    job: '도적',
-  },
-  {
-    id: 3,
-    image: 'https://placeimg.com/64/64/3',
-    name: '돌쇠',
-    birthday: '1900-02-02',
-    gender: 'Male',
-    job: '노비',
-  }
-];
-
 class App extends React.Component {
-  render () {
-    const {classes} = this.props? this.props : null;
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers : null,
+    };
+  }
+
+  // 컴포넌트가 구성된 후 실행되는 메소드로 api로부터 정보요청에 주로 씀.
+  componentDidMount() {
+    console.log("componentDidMount 실행");
+    this.callApi().then(res => this.setState({ customers: res })).catch(err => console.log(err));
+  }
+
+  callApi = async () => {
+    const res = await fetch('/api/customers');
+    const body = await res.json();
+
+    return body;
+  };
+
+  render() {
+    const { classes } = this.props ? this.props : null;
 
     return (
       <Paper>
@@ -85,19 +67,19 @@ class App extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customers.map(current => {
+            {this.state.customers ? this.state.customers.map(current => {
               return (
-                  <Customer
-                    key={current.id}
-                    id={current.id}
-                    image={current.image}
-                    name={current.name}
-                    birthday={current.birthday}
-                    gender={current.gender}
-                    job={current.job}
-                  />
-                  );
-                })}
+                <Customer
+                  key={current.id}
+                  id={current.id}
+                  image={current.image}
+                  name={current.name}
+                  birthday={current.birthday}
+                  gender={current.gender}
+                  job={current.job}
+                />
+              );
+            }): 'loading'}
           </TableBody>
         </Table>
       </Paper>
