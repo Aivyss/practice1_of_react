@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import Customer from './components/Customer';
+import LoadingBar from './LoadingBar';
 
 // Material UIs
 // Table 컴포넌트들
@@ -26,21 +27,34 @@ const styles = theme => ({
   },
   table: {
     minWidth: 1080
+  },
+  progress: {
+    margin: theme.spacing(2)
   }
 });
+
+/*
+  컴포넌트 라이프 사이클
+  constructor() -> componentWillMount() -> render() -> componentDidMount()
+
+  props나 state 변경시
+  shouldComponentUpdate() -> render()
+*/
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       customers : null,
+      completed: 0,
     };
   }
 
   // 컴포넌트가 구성된 후 실행되는 메소드로 api로부터 정보요청에 주로 씀.
   componentDidMount() {
     console.log("componentDidMount 실행");
-    this.callApi().then(res => this.setState({ customers: res })).catch(err => console.log(err));
+    this.timer = setInterval(this.progress, 200);
+     this.callApi().then(res => this.setState({ customers: res })).catch(err => console.log(err));
   }
 
   callApi = async () => {
@@ -49,6 +63,12 @@ class App extends React.Component {
 
     return body;
   };
+
+  progress = () => {
+    const {completed} = this.state;
+    console.log(completed);
+    this.setState({completed: completed >= 100 ? 0 : completed + 1})
+  }
 
   render() {
     const { classes } = this.props ? this.props : null;
@@ -79,7 +99,7 @@ class App extends React.Component {
                   job={current.job}
                 />
               );
-            }): 'loading'}
+            }) : <LoadingBar className={classes.progress} completed={this.state.completed}/>}
           </TableBody>
         </Table>
       </Paper>
