@@ -54,13 +54,14 @@ class App extends React.Component {
   componentDidMount() {
     console.log("componentDidMount 실행");
     this.timer = setInterval(this.progress, 200);
-     this.callApi().then(res => this.setState({ customers: res })).catch(err => console.log(err));
+    this.callApi().then(res => this.setState({ customers: res })).catch(err => console.log(err));
   }
 
   callApi = async () => {
+    console.log("너 왜 안함?");
     const res = await fetch('/api/customers');
     const body = await res.json();
-
+    
     return body;
   };
 
@@ -90,13 +91,13 @@ class App extends React.Component {
             {this.state.customers ? this.state.customers.map(current => {
               return (
                 <Customer
-                  key={current.id}
-                  id={current.id}
-                  image={current.image}
-                  name={current.name}
-                  birthday={current.birthday}
-                  gender={current.gender}
-                  job={current.job}
+                  key={current.ID}
+                  id={current.ID}
+                  image={current.IMAGE}
+                  name={current.NAME}
+                  birthday={current.BIRTHDAY}
+                  gender={current.GENDER}
+                  job={current.JOB}
                 />
               );
             }) : <LoadingBar className={classes.progress} completed={this.state.completed}/>}
