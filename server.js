@@ -19,6 +19,13 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
+//멀터 객체
+const multer = require('multer');
+const upload = multer({dest : './upload'});
+// 클라이언트가 확인할 수 있도록 경로지정, 클라이언트는 /image로 접근 매핑이 ./upload로 됨.
+app.use('/image', express.static('./upload')); 
+
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
@@ -26,11 +33,26 @@ app.get('/api/customers', (req, res) => {
     connection.query(
         "SELECT * FROM CUSTOMER",
         (err, rows, fields) => {
-            console.log("왜안돼 ㅠㅠㅠ");
             console.log(JSON.parse(JSON.stringify(rows)));
             res.send(rows);
         }
     ); // 처리가 완료되어 돌아오는 반환값은 row에 존재
+});
+
+// 파일이 들어가있는 요청
+app.post('/api/customers/add', upload.single('image') , (req, res) => {
+    let sql = "INSERT INTO CUSTOMER (ID, IMAGE, NAME, BIRTHDAY, GENDER, JOB ) VALUES (null, ?, ?, ?, ?, ? )";
+    let image = `/image/${req.file.filename}`; // multer 라이브러리가 이름을 무작위로 바꾸어줌
+    let name = req.body.name;
+    let birthday = req.body.birthday;
+    let gender = req.body.gender;
+    let job = req.body.job;
+    let params = [image, name, birthday, gender, job];
+    console.log(params);
+
+    connection.query(sql, params, (err, rows, fields) => {
+        res.send(rows);
+    })
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
