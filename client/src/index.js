@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-//import * as serviceWorker from './serviceWoker';
 import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 
 const theme = createTheme({

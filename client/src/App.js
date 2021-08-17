@@ -121,6 +121,7 @@ class App extends React.Component {
     this.state = {
       customers: null,
       completed: 0,
+      searchKeyword: '',
     };
   }
 
@@ -146,6 +147,7 @@ class App extends React.Component {
     this.setState({
       customer: null,
       completed: 0,
+      searchKeyword: '',
     });
 
     this.callApi().then(res => {
@@ -160,9 +162,38 @@ class App extends React.Component {
     this.setState({ completed: completed >= 100 ? 0 : completed + 1 })
   }
 
+  // 값 감지 이벤트 함수
+  handleValueChange = (e) => {
+    let nextState = {};
+    nextState[e.target.name] = e.target.value;
+    this.setState(nextState);
+    
+  }
+
   render() {
     const { classes } = this.props ? this.props : null;
     const cellList = ['번호', '프로필', '이름', '생년월일', '성별', '직업', '삭제'];
+    const filteredComponents = (data) => {
+      /*
+        검색 키워드의 글자수가 0개 이상
+      */
+      data = data.filter(curr => curr.NAME.indexOf(this.state.searchKeyword) > -1);
+
+      return data.map(current => {
+        return (
+          <Customer
+              key={current.ID}
+              id={current.ID}
+              image={current.IMAGE}
+              name={current.NAME}
+              birthday={current.BIRTHDAY}
+              gender={current.GENDER}
+              job={current.JOB}
+              stateRefresh={this.stateRefresh}
+          />
+        );
+      });
+    };
 
     return (
       <div className={classes.root}>
@@ -190,6 +221,9 @@ class App extends React.Component {
                   input: classes.inputInput,
                 }}
                 inputProps={{ 'aria-label': 'search' }}
+                name="searchKeyword"
+                value={this.state.searchKeyword}
+                onChange={this.handleValueChange}
               />
             </div>
           </Toolbar>
@@ -202,28 +236,14 @@ class App extends React.Component {
           <Table>
             <TableHead>
               <TableRow>
-                {cellList.map(curr => {
-                  return (
-                    <TableCell className={classes.tableHead}>{curr}</TableCell>
-                  );
-                })}
+                {cellList.map(curr => <TableCell className={classes.tableHead}>{curr}</TableCell>)}
               </TableRow>
             </TableHead>
             <TableBody>
-              {this.state.customers ? this.state.customers.map(current => {
-                return (
-                  <Customer
-                    key={current.ID}
-                    id={current.ID}
-                    image={current.IMAGE}
-                    name={current.NAME}
-                    birthday={current.BIRTHDAY}
-                    gender={current.GENDER}
-                    job={current.JOB}
-                    stateRefresh={this.stateRefresh}
-                  />
-                );
-              }) : <LoadingBar className={classes.progress} completed={this.state.completed} />}
+              {
+                this.state.customers ? filteredComponents(this.state.customers)
+                  : <LoadingBar className={classes.progress} completed={this.state.completed} /> 
+              }
             </TableBody>
           </Table>
         </Paper>
