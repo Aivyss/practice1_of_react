@@ -29,19 +29,24 @@ app.use('/image', express.static('./upload'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+
+// 첫페이지 요청(회원정보 요청)
 app.get('/api/customers', (req, res) => {
-    connection.query(
-        "SELECT * FROM CUSTOMER",
-        (err, rows, fields) => {
-            console.log(JSON.parse(JSON.stringify(rows)));
-            res.send(rows);
-        }
-    ); // 처리가 완료되어 돌아오는 반환값은 row에 존재
+    let sql = `SELECT
+                     * 
+                FROM 
+                    CUSTOMER
+                WHERE
+                    ISDELETED = 0`;
+    connection.query(sql, (err, rows, fields) => {
+        console.log(JSON.parse(JSON.stringify(rows)));
+        res.send(rows);
+    }); // 처리가 완료되어 돌아오는 반환값은 row에 존재
 });
 
 // 파일이 들어가있는 요청
 app.post('/api/customers/add', upload.single('image') , (req, res) => {
-    let sql = "INSERT INTO CUSTOMER (ID, IMAGE, NAME, BIRTHDAY, GENDER, JOB ) VALUES (null, ?, ?, ?, ?, ? )";
+    let sql = "INSERT INTO CUSTOMER (ID, IMAGE, NAME, BIRTHDAY, GENDER, JOB, ISDELETED, CREATEDATE ) VALUES (null, ?, ?, ?, ?, ?, 0, null )";
     let image = `/image/${req.file.filename}`; // multer 라이브러리가 이름을 무작위로 바꾸어줌
     let name = req.body.name;
     let birthday = req.body.birthday;
@@ -53,6 +58,19 @@ app.post('/api/customers/add', upload.single('image') , (req, res) => {
     connection.query(sql, params, (err, rows, fields) => {
         res.send(rows);
     })
+});
+
+app.delete('/api/customers/delete/:id', (req,res) => {
+    let sql = `UPDATE CUSTOMER SET 
+                    ISDELETED = 1
+                WHERE
+                    ID = ?`;
+    let params = [req.params.id];
+
+    connection.query(sql, params, (err, rows, fields) => {
+        res.send(rows);
+        console.log(err);
+    });
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
