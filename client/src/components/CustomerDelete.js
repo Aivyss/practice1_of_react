@@ -3,6 +3,9 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import { DialogActions } from '@material-ui/core';
+import { DialogContent } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
+
 class CustomerDelete extends React.Component {
     constructor(props) {
         super(props);
@@ -40,6 +43,11 @@ class CustomerDelete extends React.Component {
                 <Button variant="outlined" color="secondary" onClick={this.handleClickOpen}>삭제</Button>
                 <Dialog open={this.state.open} varient="contained" onClose={this.handleClose}>
                     <DialogTitle>정말 삭제하시겠습니까?</DialogTitle>
+                    <DialogContent>
+                        <Typography gutterBottom>
+                            선택한 고객정보가 삭제됩니다.
+                        </Typography>
+                    </DialogContent>
                     <DialogActions>
                         <Button variant="outlined" color="secondary" onClick={ e => this.deleteCustomer(this.props.id)}>
                             예

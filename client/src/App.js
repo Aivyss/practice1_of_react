@@ -21,18 +21,90 @@ import { withStyles } from '@material-ui/core/styles';
 //클래스명 복수개 적용
 import classNames from 'classnames';
 
+// App bar 컴포넌트 임포트 makeStyles는 React hook에서 쓰는 것이라 뺌, fade는 deprecated.
+import { AppBar } from '@material-ui/core';
+import { Toolbar } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
+import { InputBase } from '@material-ui/core';
+import { fade } from '@material-ui/core';
+import { alpha } from '@material-ui/core/styles';
+import MenuIcon from '@material-ui/icons/Menu';
+import SearchIcon from '@material-ui/icons/Search';
+
 const styles = theme => ({
   root: {
     width: "100%",
     overflowX: "auto",
-    marginTop: theme.spacing(3)
+    minWidth: 1080,
   },
-  table: {
-    minWidth: 1080
+  tableHead: {
+    backgroundColor: "black",
+    color: "white",
+    fontSize: "1.3rem",
+  },
+  paper: {
+    marginLeft: 18,
+    marginRight: 18,
   },
   progress: {
     margin: theme.spacing(2)
-  }
+  },
+  menu: {
+    marginTop: 15,
+    marginBottom: 15,
+    display: "flex",
+    justifyContent: 'center',
+  },
+  menuButton: {
+    marginRight: theme.spacing(2),
+  },
+  title: {
+    flexGrow: 1,
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+    },
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
 });
 
 /*
@@ -47,7 +119,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      customers : null,
+      customers: null,
       completed: 0,
     };
   }
@@ -65,7 +137,7 @@ class App extends React.Component {
   callApi = async () => {
     const res = await fetch('/api/customers');
     const body = await res.json();
-    
+
     return body;
   };
 
@@ -73,7 +145,7 @@ class App extends React.Component {
   stateRefresh = () => {
     this.setState({
       customer: null,
-      completed : 0,
+      completed: 0,
     });
 
     this.callApi().then(res => {
@@ -83,27 +155,58 @@ class App extends React.Component {
   }
 
   progress = () => {
-    const {completed} = this.state;
+    const { completed } = this.state;
     console.log(completed);
-    this.setState({completed: completed >= 100 ? 0 : completed + 1})
+    this.setState({ completed: completed >= 100 ? 0 : completed + 1 })
   }
 
   render() {
     const { classes } = this.props ? this.props : null;
+    const cellList = ['번호', '프로필', '이름', '생년월일', '성별', '직업', '삭제'];
 
     return (
-      <div>
-        <Paper>
-          <Table className={classNames(classes.root, classes.table)}>
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="open drawer"
+            >
+            <MenuIcon />
+            </IconButton>
+            <Typography className={classes.title} variant="h6" noWrap>
+              고객 관리 시스템
+            </Typography>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                placeholder="검색하기"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </div>
+          </Toolbar>
+        </AppBar>
+        <div className={classes.menu}>
+          <CustomerAdd stateRefresh={this.stateRefresh} />
+        </div>
+
+        <Paper className={classes.paper}>
+          <Table>
             <TableHead>
               <TableRow>
-                <TableCell>번호</TableCell>
-                <TableCell>프로필</TableCell>
-                <TableCell>이름</TableCell>
-                <TableCell>생년월일</TableCell>
-                <TableCell>성별</TableCell>
-                <TableCell>직업</TableCell>
-                <TableCell>삭제</TableCell>
+                {cellList.map(curr => {
+                  return (
+                    <TableCell className={classes.tableHead}>{curr}</TableCell>
+                  );
+                })}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -120,11 +223,10 @@ class App extends React.Component {
                     stateRefresh={this.stateRefresh}
                   />
                 );
-              }) : <LoadingBar className={classes.progress} completed={this.state.completed}/>}
+              }) : <LoadingBar className={classes.progress} completed={this.state.completed} />}
             </TableBody>
           </Table>
         </Paper>
-        <CustomerAdd stateRefresh={this.stateRefresh}/>
       </div>
     );
   }
@@ -132,4 +234,3 @@ class App extends React.Component {
 
 
 export default withStyles(styles)(App);
-//export default App;
