@@ -69,6 +69,19 @@ class App extends React.Component {
     return body;
   };
 
+  // state를 초기화 하는 함수.
+  stateRefresh = () => {
+    this.setState({
+      customer: null,
+      completed : 0,
+    });
+
+    this.callApi().then(res => {
+      this.setState({ customers: res });
+      clearInterval(this.timer);
+    }).catch(err => console.log(err));
+  }
+
   progress = () => {
     const {completed} = this.state;
     console.log(completed);
@@ -109,7 +122,7 @@ class App extends React.Component {
             </TableBody>
           </Table>
         </Paper>
-        <CustomerAdd/>
+        <CustomerAdd stateRefresh={this.stateRefresh}/>
       </div>
     );
   }

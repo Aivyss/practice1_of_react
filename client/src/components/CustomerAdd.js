@@ -17,9 +17,12 @@ class CustomerAdd extends React.Component {
     // 핸들링 함수 서밋,파일,값
     handleFormSubmit = e => {
         e.preventDefault(); // 값 전송시 이벤트로 인한 오류 방지
-        this.addCustomer().then(response => {console.log(response.data)});
+        this.addCustomer().then(response => {
+            console.log(response.data);
+            this.props.stateRefresh();
+        });
 
-        // 실제로 이렇게 코딩하면 안됨. 테스트용
+        // 스테이트 초기화
         this.setState({
             file: null,
             userName: '',
@@ -28,7 +31,6 @@ class CustomerAdd extends React.Component {
             job: '',
             fileName: ''
         });
-        window.location.reload();
     }
 
     handleFileChange = e => {
